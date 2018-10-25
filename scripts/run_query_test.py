@@ -8,12 +8,15 @@ parser.add_option("-i", "--input", help="directory of input queries")
 parser.add_option("-t", "--test", help="tesname to execute [power|throughput]")
 
 (options, args) = parser.parse_args()
-if not (options.input and options.test):
+if not (options.input and options.test and options.test in ["power","throughput"]):
     parser.print_help()
     exit(1)
 
+
 input_dir = options.input
 exec_test = options.test
+
+
 
 rule = '-- end query .* in stream . using template.query.*.tpl'
 
@@ -50,7 +53,7 @@ def generate_timed_query(query_num):
     return modified_queries
 
 def execute_single_query(query_num):
-    fname = exec_test+"_"+query_num+"_tpcds.sql"
+    fname = exec_test+"_"+str(query_num)+"_tpcds.sql"
     with open("/tmp/"+fname, 'w') as f:
         f.write(generate_timed_query(0)) 
     exec_query_command = "memsql -D tpcds < /tmp/"+fname

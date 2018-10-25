@@ -17,7 +17,10 @@ data_dir = options.dir
 out_dir = options.output
 refresh_num = options.refresh
 
+# TODO: Method 1 Implementation
+
 # Method 2 Implementation
+dm_queries = []
 with open(data_dir+"/delete_"+str(refresh_num)+".dat",'r') as f:
     rows = f.read().split('\n')[:-1] #slice to -1 to throw away empty item at the end
     for row in rows:
@@ -30,12 +33,12 @@ with open(data_dir+"/delete_"+str(refresh_num)+".dat",'r') as f:
         web_sales_delete_query = "delete web_sales from web_sales join date_dim on ws_sold_date_sk = d_date_sk where d_date between '"+start_date+"' and '"+end_date+"';"
         
         with open(out_dir+"/inventory_"+str(refresh_num)+".sql", "a") as o:
-            o.write(catalog_return_delete_query+"\n")
-            o.write(catalog_sales_delete_query+"\n")
-            o.write(store_return_delete_query+"\n")
-            o.write(store_sales_delete_query+"\n")
-            o.write(web_return_delete_query+"\n")
-            o.write(web_sales_delete_query+"\n")
+            dm_queries.append(catalog_return_delete_query+"\n")
+            dm_queries.append(catalog_sales_delete_query+"\n")
+            dm_queries.append(store_return_delete_query+"\n")
+            dm_queries.append(store_sales_delete_query+"\n")
+            dm_queries.append(web_return_delete_query+"\n")
+            dm_queries.append(web_sales_delete_query+"\n")
 
 # Method 3 Implementation
 with open(data_dir+"/inventory_delete_"+str(refresh_num)+".dat",'r') as f:
@@ -44,4 +47,19 @@ with open(data_dir+"/inventory_delete_"+str(refresh_num)+".dat",'r') as f:
         start_date, end_date = tuple(row.split('|'))
         inventory_deletetion_query = "delete inventory from inventory join date_dim on inv_date_sk = d_date_sk where d_date between '"+start_date+"' and '"+end_date+"';"
         with open(out_dir+"/delete_inventory_"+str(refresh_num)+".sql", "a") as o:
-            o.write(inventory_deletetion_query+"\n")
+            dm_queries.append(inventory_deletetion_query+"\n")
+
+# Execute Data Modification Queries
+fname = "tpcds_data_modification.sql"
+with open("/tmp/"+fname,"w") as f:
+    log_start_query = "INSERT INTO log (log_test_name, log_start_time) VALUES ('dm_"+str(refresh_num)+"', UTC_TIMESTAMP());\n"
+    f.write("%s\n"%log_start_query)
+    for query in dm_queries:
+        f.write("%s\n"%query)
+    log_end_time = "UPDATE log SET log_end_time = UTC_TIMESTAMP() WHERE log_id = last_insert_id();\n"
+    f.write("%s\n"%log_end_time)
+    
+    exec_query_command = "memsql -D tpcds < /tmp/"+fname
+    delete_file_command = "rm /tmp/"+fname
+    os.system(exec_query_command)
+    os.system(delete_file_command)
