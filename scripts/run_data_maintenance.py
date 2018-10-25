@@ -4,6 +4,8 @@ import optparse
 parser = optparse.OptionParser()
 parser.add_option("-d", "--dir", help="refresh data directory")
 parser.add_option("-r", "--refresh", help="refresh number")
+parser.add_option("-D", "--database", help="database name")
+
 
 (options, args) = parser.parse_args()
 
@@ -12,6 +14,7 @@ if not (options.dir and options.refresh):
     exit(1)
 
 data_dir = options.dir
+db_name = options.database
 refresh_num = options.refresh
 
 # TODO: Method 1 Implementation
@@ -54,7 +57,7 @@ with open("/tmp/"+fname,"w") as f:
     log_end_time = "UPDATE log SET log_end_time = UTC_TIMESTAMP() WHERE log_id = last_insert_id();\n"
     f.write("%s\n"%log_end_time)
     
-    exec_query_command = "memsql -D tpcds < /tmp/"+fname
-    delete_file_command = "rm /tmp/"+fname
-    os.system(exec_query_command)
-    os.system(delete_file_command)
+exec_query_command = "memsql -D "+db_name+" < /tmp/"+fname
+delete_file_command = "rm /tmp/"+fname
+os.system(exec_query_command)
+os.system(delete_file_command)
