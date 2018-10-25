@@ -1,24 +1,24 @@
 import os
 import re
 import optparse
+import multiprocessing
 
 parser = optparse.OptionParser()
-parser.add_option("-o", "--output", help="output directory")
 parser.add_option("-i", "--input", help="directory of input queries")
-
+parser.add_option("-t", "--test", help="tesname to execute [power|throughput]")
 
 (options, args) = parser.parse_args()
-if not (options.output and options.input):
+if not (options.input and options.test):
     parser.print_help()
     exit(1)
 
-output_dir = options.output
 input_dir = options.input
+exec_test = options.test
 
 rule = '-- end query .* in stream . using template.query.*.tpl'
 
 def generate_timed_query(query_num):
-    with open(output_dir+"/query_"+str(query_num)+".sql") as f:
+    with open(input_dir+"/query_"+str(query_num)+".sql") as f:
         queries = f.read()
         query_ids = [q.split(' ')[9].split('.tpl')[0].split('query')[1] for q in re.findall(rule,queries)]
         queries = re.compile(rule).split(queries)[:-1]
@@ -46,9 +46,28 @@ def generate_timed_query(query_num):
         modified_queries+=query
         modified_queries+="UPDATE log SET log_end_time = UTC_TIMESTAMP() WHERE log_id = last_insert_id();\n"
 
-    with open(output_dir+"/query_"+str(query_num)+"_timed.sql", 'w') as f:
-        f.write(modified_queries)
+
+    return modified_queries
+
+def execute_single_query(query_num):
+    fname = exec_test+"_"+query_num+"_tpcds.sql"
+    with open("/tmp/"+fname, 'w') as f:
+        f.write(generate_timed_query(0)) 
+    exec_query_command = "memsql -D tpcds < /tmp/"+fname
+    delete_file_command = "rm /tmp/"+fname
+    os.system(exec_query_command)
+    os.system(delete_file_command)
 
 if __name__ == "__main__":
-    for query_file in os.listdir(input_dir+"/"):
-        generate_timed_query(query_file.split("_")[1].split(".")[0])
+    if exec_test == "power":
+        execute_single_query(0)
+    elif exec_test == "throughput":
+        query_pool = []    
+        for query_file in os.listdir(input_dir+"/"):
+            query_pool.append(query_file.split("_")[1].split(".")[0])
+        
+        pool = multiprocessing.Pool()
+        for q_num in query_pool:
+            pool.apply_async(execute_single_query, args=(q_num,))
+        pool.close()
+        pool.join()
