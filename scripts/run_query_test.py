@@ -6,17 +6,17 @@ import multiprocessing
 parser = optparse.OptionParser()
 parser.add_option("-i", "--input", help="directory of input queries")
 parser.add_option("-t", "--test", help="tesname to execute [power|throughput]")
+parser.add_option("-D", "--database", help="database name to test")
+
 
 (options, args) = parser.parse_args()
-if not (options.input and options.test and options.test in ["power","throughput"]):
+if not (options.database and options.input and options.test and options.test in ["power","throughput"]):
     parser.print_help()
     exit(1)
 
-
 input_dir = options.input
 exec_test = options.test
-
-
+db_name = options.database
 
 rule = '-- end query .* in stream . using template.query.*.tpl'
 
@@ -56,7 +56,7 @@ def execute_single_query(query_num):
     fname = exec_test+"_"+str(query_num)+"_tpcds.sql"
     with open("/tmp/"+fname, 'w') as f:
         f.write(generate_timed_query(0)) 
-    exec_query_command = "memsql -D tpcds < /tmp/"+fname
+    exec_query_command = "memsql -D "+db_name+" < /tmp/"+fname
     delete_file_command = "rm /tmp/"+fname
     os.system(exec_query_command)
     os.system(delete_file_command)
