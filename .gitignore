@@ -39,3 +39,6 @@ tags
 
 # Flat files
 *.dat
+
+# Log files
+*.log
