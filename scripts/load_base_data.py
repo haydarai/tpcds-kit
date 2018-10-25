@@ -23,8 +23,8 @@ rule = re.compile("([^0-9 ]+)") # Assume that paralellism is always used
 def load_to_db(fname):
    load_data_query="LOAD DATA LOCAL INFILE '"+data_dir+fname+"' INTO TABLE "+rule.search(fname).group(0)[:-1]+" COLUMNS TERMINATED BY '|';"
    memsql_load_command = "memsql --local-infile=1 -D "+db_name+" -e \""+load_data_query+"\""
-#    os.system(memsql_load_command)
-   print(memsql_load_command)
+   os.system(memsql_load_command)
+#    print(memsql_load_command)
    os.system("echo END loading database "+db_name+" : >> "+log_dir+"/load_data.log")
    os.system("date >> "+log_dir+"/load_data.log")
 
