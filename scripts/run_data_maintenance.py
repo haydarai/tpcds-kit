@@ -4,17 +4,14 @@ import optparse
 parser = optparse.OptionParser()
 parser.add_option("-d", "--dir", help="refresh data directory")
 parser.add_option("-r", "--refresh", help="refresh number")
-parser.add_option("-o", "--output", help="output directory")
-
 
 (options, args) = parser.parse_args()
 
-if not (options.dir and options.output and options.refresh):
+if not (options.dir and options.refresh):
     parser.print_help()
     exit(1)
 
 data_dir = options.dir
-out_dir = options.output
 refresh_num = options.refresh
 
 # TODO: Method 1 Implementation
@@ -32,13 +29,12 @@ with open(data_dir+"/delete_"+str(refresh_num)+".dat",'r') as f:
         web_return_delete_query = "delete web_returns from web_returns join web_sales on wr_item_sk = ws_item_sk and wr_order_number = ws_order_number join date_dim on ws_sold_date_sk = d_date_sk where d_date between '"+start_date+"' and '"+end_date+"';"
         web_sales_delete_query = "delete web_sales from web_sales join date_dim on ws_sold_date_sk = d_date_sk where d_date between '"+start_date+"' and '"+end_date+"';"
         
-        with open(out_dir+"/inventory_"+str(refresh_num)+".sql", "a") as o:
-            dm_queries.append(catalog_return_delete_query+"\n")
-            dm_queries.append(catalog_sales_delete_query+"\n")
-            dm_queries.append(store_return_delete_query+"\n")
-            dm_queries.append(store_sales_delete_query+"\n")
-            dm_queries.append(web_return_delete_query+"\n")
-            dm_queries.append(web_sales_delete_query+"\n")
+        dm_queries.append(catalog_return_delete_query+"\n")
+        dm_queries.append(catalog_sales_delete_query+"\n")
+        dm_queries.append(store_return_delete_query+"\n")
+        dm_queries.append(store_sales_delete_query+"\n")
+        dm_queries.append(web_return_delete_query+"\n")
+        dm_queries.append(web_sales_delete_query+"\n")
 
 # Method 3 Implementation
 with open(data_dir+"/inventory_delete_"+str(refresh_num)+".dat",'r') as f:
@@ -46,8 +42,7 @@ with open(data_dir+"/inventory_delete_"+str(refresh_num)+".dat",'r') as f:
     for row in rows:
         start_date, end_date = tuple(row.split('|'))
         inventory_deletetion_query = "delete inventory from inventory join date_dim on inv_date_sk = d_date_sk where d_date between '"+start_date+"' and '"+end_date+"';"
-        with open(out_dir+"/delete_inventory_"+str(refresh_num)+".sql", "a") as o:
-            dm_queries.append(inventory_deletetion_query+"\n")
+        dm_queries.append(inventory_deletetion_query+"\n")
 
 # Execute Data Modification Queries
 fname = "tpcds_data_modification.sql"
