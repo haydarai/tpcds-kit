@@ -42,3 +42,4 @@ tags
 
 # Log files
 *.log
+query_*/

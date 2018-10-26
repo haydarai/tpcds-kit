@@ -7,6 +7,7 @@ parser = optparse.OptionParser()
 parser.add_option("-i", "--input", help="directory of input queries")
 parser.add_option("-t", "--test", help="tesname to execute [power|throughput]")
 parser.add_option("-D", "--database", help="database name to test")
+parser.add_option("-s", "--session", help="Session number for throughput test [1|2]")
 
 
 (options, args) = parser.parse_args()
@@ -26,8 +27,7 @@ def generate_timed_query(query_num):
         query_ids = [q.split(' ')[9].split('.tpl')[0].split('query')[1] for q in re.findall(rule,queries)]
         queries = re.compile(rule).split(queries)[:-1]
 
-    n_test = (len(os.listdir(input_dir+"/"))-1)/2
-
+    n_test = int((len(os.listdir(input_dir+"/"))-1)/2)
     ## Create condition for testname
     if (int(query_num) == 0):
         test_name = 'power_test'
@@ -55,7 +55,7 @@ def generate_timed_query(query_num):
 def execute_single_query(query_num):
     fname = exec_test+"_"+str(query_num)+"_tpcds.sql"
     with open("/tmp/"+fname, 'w') as f:
-        f.write(generate_timed_query(0)) 
+        f.write(generate_timed_query(query_num)) 
     exec_query_command = "memsql -D "+db_name+" < /tmp/"+fname
     delete_file_command = "rm /tmp/"+fname
     os.system(exec_query_command)
@@ -65,10 +65,18 @@ if __name__ == "__main__":
     if exec_test == "power":
         execute_single_query(0)
     elif exec_test == "throughput":
-        query_pool = []    
-        for query_file in os.listdir(input_dir+"/"):
-            query_pool.append(query_file.split("_")[1].split(".")[0])
-        
+        if not (options.session and options.session in ["1","2"]):
+            parser.print_help()
+            exit(1)
+        session = options.session
+        if session == "1":
+            q_from = 1
+            q_to = int((len(os.listdir(input_dir+"/"))+1)/2)
+        else:
+            q_from = int((len(os.listdir(input_dir+"/"))+1)/2)
+            q_to = len(os.listdir(input_dir+"/"))
+
+        query_pool = list(range(q_from,q_to))
         pool = multiprocessing.Pool()
         for q_num in query_pool:
             pool.apply_async(execute_single_query, args=(q_num,))
