@@ -47,8 +47,8 @@ create table log
     log_test_name               varchar(64)                 ,
     log_stream_num              integer                     ,
     log_query_num               integer                     ,
-    log_start_time              datetime                    ,
-    log_end_time                datetime                    ,
+    log_start_time              datetime (6)                ,
+    log_end_time                datetime (6)                ,
     key(log_id) using clustered columnstore
 );
 
