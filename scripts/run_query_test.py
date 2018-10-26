@@ -44,10 +44,10 @@ def generate_timed_query(query_num):
         stream_num = 0
     modified_queries = ''
     for i in range(99):
-        modified_queries+="INSERT INTO log (log_stream_num, log_query_num, log_test_name, log_start_time) VALUES ("+str(stream_num)+","+str(query_ids[i])+",'"+test_name+"', UTC_TIMESTAMP());\n"
+        modified_queries+="INSERT INTO log (log_stream_num, log_query_num, log_test_name, log_start_time) VALUES ("+str(stream_num)+","+str(query_ids[i])+",'"+test_name+"', UTC_TIMESTAMP(6));\n"
         query = queries[i]
         modified_queries+=query
-        modified_queries+="UPDATE log SET log_end_time = UTC_TIMESTAMP() WHERE log_id = last_insert_id();\n"
+        modified_queries+="UPDATE log SET log_end_time = UTC_TIMESTAMP(6) WHERE log_id = last_insert_id();\n"
 
 
     return modified_queries

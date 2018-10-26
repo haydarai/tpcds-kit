@@ -50,11 +50,11 @@ with open(data_dir+"/inventory_delete_"+str(refresh_num)+".dat",'r') as f:
 # Execute Data Modification Queries
 fname = "tpcds_data_modification.sql"
 with open("/tmp/"+fname,"w") as f:
-    log_start_query = "INSERT INTO log (log_test_name, log_start_time) VALUES ('dm_"+str(refresh_num)+"', UTC_TIMESTAMP());\n"
+    log_start_query = "INSERT INTO log (log_test_name, log_start_time) VALUES ('dm_"+str(refresh_num)+"', UTC_TIMESTAMP(6));\n"
     f.write("%s\n"%log_start_query)
     for query in dm_queries:
         f.write("%s\n"%query)
-    log_end_time = "UPDATE log SET log_end_time = UTC_TIMESTAMP() WHERE log_id = last_insert_id();\n"
+    log_end_time = "UPDATE log SET log_end_time = UTC_TIMESTAMP(6) WHERE log_id = last_insert_id();\n"
     f.write("%s\n"%log_end_time)
     
 exec_query_command = "memsql -D "+db_name+" < /tmp/"+fname

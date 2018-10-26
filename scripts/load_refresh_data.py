@@ -30,13 +30,14 @@ def load_to_db(fname):
 #    print(memsql_load_command)
    os.system(memsql_load_command)
    os.system("echo END loading database "+db_name+" : >> "+log_dir+"/load_refresh_data.log")
-   os.system("date >> "+log_dir+"/load_refresh_data.log")   
+   os.system("date +'%F %T:%3N' >> "+log_dir+"/load_refresh_data.log")   
 
 if __name__ == '__main__':
    os.system("echo END loading database "+db_name+" : >> "+log_dir+"/load_refresh_data.log")
-   os.system("date >> "+log_dir+"/load_refresh_data.log")
+   os.system("date +'%F %T:%3N' >> "+log_dir+"/load_refresh_data.log")
    pool = multiprocessing.Pool(48)
    for fname in [fname for fname in os.listdir(data_dir) if (fname[:2]=="s_" and str(refresh_num) in fname)]:
        pool.apply_async(load_to_db, args=(fname,))
    pool.close()
    pool.join()
+   
