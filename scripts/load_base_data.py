@@ -26,11 +26,11 @@ def load_to_db(fname):
    os.system(memsql_load_command)
 #    print(memsql_load_command)
    os.system("echo END loading database "+db_name+" : >> "+log_dir+"/load_data.log")
-   os.system("date >> "+log_dir+"/load_data.log")
+   os.system("date +'%F %T:%3N' >> "+log_dir+"/load_data.log")
 
 if __name__ == '__main__':
    os.system("echo START loading database "+db_name+" : >> "+log_dir+"/load_data.log")
-   os.system("date >> "+log_dir+"/load_data.log")
+   os.system("date +'%F %T:%3N' >> "+log_dir+"/load_data.log")
    pool = multiprocessing.Pool(16)
    for fname in os.listdir(data_dir):
        pool.apply_async(load_to_db, args=(fname,))
