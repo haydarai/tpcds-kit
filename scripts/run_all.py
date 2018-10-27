@@ -5,8 +5,8 @@ parser = optparse.OptionParser()
 
 parser.add_option("-D", "--database", help="Database name")
 parser.add_option("-l", "--logdir", help="Directory to save the log files")
-parser.add_option("r","--refreshdir", help="Refresh data dir")
-parser.add_option("q","--querydir", help="Query dir")
+parser.add_option("-r","--refreshdir", help="Refresh data dir")
+parser.add_option("-q","--querydir", help="Query dir")
 parser.add_option("-b","--basedir", help="Base data dir")
 
 (options, args) = parser.parse_args()
