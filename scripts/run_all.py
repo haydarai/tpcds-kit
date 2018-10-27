@@ -10,7 +10,7 @@ parser.add_option("-q","--querydir", help="Query dir")
 parser.add_option("-b","--basedir", help="Base data dir")
 
 (options, args) = parser.parse_args()
-if not (options.database and options.logidr):
+if not (options.database and options.logdir and options.refreshdir and options.querydir and options.basedir):
     parser.print_help()
     exit(1)
 
