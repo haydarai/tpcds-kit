@@ -18,7 +18,7 @@ load_base_data = "python load_base_data.py -D "+options.database+" -d "+options.
 throughput_test_1 = "python run_query_test.py -D "+options.database+" -i "+options.querydir+"/ -t throughput -s 1"
 data_maintenance_1 = "python run_data_maintenance.py -D "+options.database+" -r 1 -d "+options.refreshdir+"/"
 throughput_test_2 = "python run_query_test.py -D "+options.database+" -i "+options.querydir+"/ -t throughput -s 2"
-data_maintenance_2 = "python run_data_maintenance.py -D "+options.database+" -r 1 -d "+options.refreshdir+"/"
+data_maintenance_2 = "python run_data_maintenance.py -D "+options.database+" -r 2 -d "+options.refreshdir+"/"
 
 os.system(load_base_data)
 os.system(throughput_test_1)
