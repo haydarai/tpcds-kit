@@ -41,6 +41,17 @@ create table dbgen_version
     dv_cmdline_args           varchar(200)                  
 );
 
+create table log 
+(
+    log_id                      integer AUTO_INCREMENT      ,
+    log_test_name               varchar(64)                 ,
+    log_stream_num              integer                     ,
+    log_query_num               integer                     ,
+    log_start_time              datetime (6)                ,
+    log_end_time                datetime (6)                ,
+    key(log_id) using clustered columnstore
+);
+
 create table customer_address
 (
     ca_address_sk             integer               not null,
